@@ -188,6 +188,7 @@ static Client *nexttiled(Client *c);
 static void pop(Client *);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
+static void restart(const Arg *arg);
 static Monitor *recttomon(int x, int y, int w, int h);
 static void resize(Client *c, int x, int y, int w, int h, int interact);
 static void resizeclient(Client *c, int x, int y, int w, int h);
@@ -201,6 +202,7 @@ static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
 static void setlayout(const Arg *arg);
+static void togglefullscreen(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
 static void seturgent(Client *c, int urg);
@@ -262,6 +264,7 @@ static void (*handler[LASTEvent]) (XEvent *) = {
 };
 static Atom wmatom[WMLast], netatom[NetLast];
 static int running = 1;
+static int toggledfullscreen = 0;
 static Cur *cursor[CurLast];
 static Clr **scheme;
 static Display *dpy;
@@ -960,7 +963,7 @@ grabkeys(void)
 
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
 		for (i = 0; i < LENGTH(keys); i++)
-			if ((code = XKeysymToKeycode(dpy, keys[i].keysym)))
+			if ((code = XKeysymToKeycode(dpy,keys[i].keysym)))
 				for (j = 0; j < LENGTH(modifiers); j++)
 					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
 						True, GrabModeAsync, GrabModeAsync);
@@ -1255,6 +1258,18 @@ quit(const Arg *arg)
 	running = 0;
 }
 
+void
+restart(const Arg *arg)
+{
+	char* args[] = {"perl", "-e",
+		"$home = $ENV{HOME};"
+			"chdir \"$home/.config/dwm\";"
+			"`make`; chdir $home;"
+			"exec \"$home/.config/dwm/dwm\";",
+		NULL};
+	execvp(args[0], args);
+}
+
 Monitor *
 recttomon(int x, int y, int w, int h)
 {
@@ -1513,6 +1528,26 @@ setlayout(const Arg *arg)
 		arrange(selmon);
 	else
 		drawbar(selmon);
+}
+
+void
+togglefullscreen(const Arg *arg)
+{
+	Arg argbar = {0};
+
+	togglebar(&argbar);
+
+	if (toggledfullscreen) {
+		Arg fsarg = {.v = &layouts[0]};
+		setlayout(&fsarg);
+
+		toggledfullscreen = 0;
+	} else {
+		Arg fsarg = {.v = &layouts[1]};
+		setlayout(&fsarg);
+
+		toggledfullscreen = 1;
+	}
 }
 
 /* arg > 1.0 will set mfact absolutely */
@@ -2148,6 +2183,7 @@ main(int argc, char *argv[])
 		die("pledge");
 #endif /* __OpenBSD__ */
 	scan();
+	system("feh --bg-fill $HOME/Images/Wallpapers/current.*");
 	run();
 	cleanup();
 	XCloseDisplay(dpy);
