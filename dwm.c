@@ -1264,12 +1264,12 @@ quit(const Arg *arg)
 void
 restart(const Arg *arg)
 {
-	char* args[] = {"perl", "-e",
-		"$home = $ENV{HOME};"
-			"chdir \"$home/.config/dwm\";"
-			"`make`; chdir $home;"
-			"exec \"$home/.config/dwm/dwm\";",
+
+	char* args[] = {"sh", "-c", "exec $HOME/.config/dwm/dwm",
 		NULL};
+
+	system("make -C $HOME/.config/dwm");
+
 	execvp(args[0], args);
 }
 
