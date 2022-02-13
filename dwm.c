@@ -1604,7 +1604,7 @@ setup(void)
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
-	bh = drw->fonts->h + 2;
+	bh = userbh ? userbh : drw->fonts->h + 2;
 	updategeom();
 	/* init atoms */
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
@@ -1753,6 +1753,7 @@ tile(Monitor *m)
 		mw = m->ww - m->gappx;
 		ns = 1;
 	}
+
 	for (i = 0, my = ty = m->gappx, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
 		if (i < m->nmaster) {
 			h = (m->wh - my) / (MIN(n, m->nmaster) - i) - m->gappx;
@@ -2214,6 +2215,8 @@ main(int argc, char *argv[])
 #endif /* __OpenBSD__ */
 	scan();
 	system("feh --bg-fill $HOME/Images/Wallpapers/current.*");
+	system("picom &");
+	system("killall bar.sh; $HOME/.config/dwm/bar.sh &");
 	run();
 	cleanup();
 	XCloseDisplay(dpy);
