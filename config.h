@@ -71,6 +71,7 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "--fn", dmenufont
 static const char *termcmd[]  = { "alacritty", NULL };
 static const char *browser[]  = { "perl", "-e", "$a=`xdg-settings get default-web-browser`; $a =~ /\\.desktop/; exec $`", NULL };
 static const char *flameshot[]  = { "flameshot", "gui", NULL };
+static const char *killproc[]  = {"sh", "-c", "killall -s SIGKILL $(ps -e | awk '{print $4}' | sort -u | dmenu -i)", NULL};
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -78,6 +79,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_Return, spawn,            {.v = termcmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,            {.v = browser } },
 	{ NULL,                         XK_Print,  spawn,            {.v = flameshot } },
+	{ MODKEY|ShiftMask,             XK_b,      spawn,            {.v = killproc} },
 	{ MODKEY,                       XK_b,      togglebar,        {0} },
 	{ MODKEY,                       XK_j,      focusstack,       {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,       {.i = -1 } },
