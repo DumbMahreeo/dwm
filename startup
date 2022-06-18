@@ -9,9 +9,4 @@ system "make";
 
 chdir $home;
 
-#if (fork == 0) {
-#    sleep 1
-#    `feh --bg-fill $HOME/Images/Wallpapers/current.*`;
-#}
-
 exec "$pwd/dwm";
